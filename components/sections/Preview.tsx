@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const Preview = () => {
   return (
-    <div>Preview</div>
-  )
-}
+    <div id="preview">
+      <div>Preview</div>
+    </div>
+  );
+};
 
-export default Preview
+export default Preview;
