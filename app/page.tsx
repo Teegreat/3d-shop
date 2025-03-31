@@ -8,16 +8,16 @@ import Sale from "@/components/sections/Sale";
 
 export default function Home() {
   return (
-    <div className="text-slate-100">
+    <main className="text-slate-100">
       <Navbar />
       <Hero />
       <Products />
       <Features />
       <Reviews />
-      <div className="text-stone-800">
+      <div className="bg-stone-800">
         <Sale />
         <Footer />
       </div>
-    </div>
+    </main>
   );
 }
