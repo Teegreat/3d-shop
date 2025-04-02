@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
 import AnimatedContainer from "./AnimatedContainer";
+import { useCart } from "./sections/Cart";
 
 interface ProductCardProps {
   index: number;
@@ -19,6 +22,17 @@ const ProductCard = ({
   isActive,
   onClick,
 }: ProductCardProps) => {
+  const { addToCart } = useCart();
+
+  const handleBuy = () => {
+    addToCart({
+      imgSrc,
+      title,
+      price,
+      quantity: 1,
+    });
+  };
+
   return (
     <div
       onClick={onClick}
@@ -42,7 +56,7 @@ const ProductCard = ({
           <h3 className="text-lg font-semibold">{title}</h3>
           <div className="flex flex-row justify-between items-center">
             <p className="text-slate-400">${price}</p>
-            <div className="w-16 flex justify-center py-1 text-sm border rounded-xl hover:bg-stone-200 hover:text-stone-800 transition duration-300">
+            <div onClick={handleBuy} className="w-16 flex justify-center py-1 text-sm border rounded-xl hover:bg-stone-200 hover:text-stone-800 transition duration-300">
               Buy
             </div>
           </div>
