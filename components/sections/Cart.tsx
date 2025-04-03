@@ -44,7 +44,15 @@ interface CartProductProps {
   onDelete: () => void;
 }
 
-const CartProduct = ({ imgSrc, title, price, quantity, onAdd, onRemove, onDelete }: CartProductProps) => {
+const CartProduct = ({
+  imgSrc,
+  title,
+  price,
+  quantity,
+  onAdd,
+  onRemove,
+  onDelete,
+}: CartProductProps) => {
   return (
     <div className="h-32 flex flex-row justify-between pr-3 md:pr-8 bg-stone-950 rounded-xl">
       <div className="flex flex-row gap-4 md:gap-8">
@@ -77,7 +85,14 @@ const CartProduct = ({ imgSrc, title, price, quantity, onAdd, onRemove, onDelete
 };
 
 const Cart = () => {
-  const { isOpen, toggleCart, cartItems, handleAddProduct, handleRemoveProduct, handleDeleteProduct } = useCart();
+  const {
+    isOpen,
+    toggleCart,
+    cartItems,
+    handleAddProduct,
+    handleRemoveProduct,
+    handleDeleteProduct,
+  } = useCart();
   const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
@@ -93,6 +108,26 @@ const Cart = () => {
   }, [cartItems]);
 
   if (!isOpen) return null;
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ products: cartItems }),
+      });
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Error checking out:", error);
+      toast.error("Check out failed. Please try again.");
+    }
+  };
 
   return (
     <div className="fixed h-screen w-screen top-0 left-0 flex items-center justify-center z-50 bg-opacity-75 bg-stone-950">
@@ -123,7 +158,10 @@ const Cart = () => {
               <p className="text-lg font-semibold text-slate-300">
                 Total: ${total.toFixed(2)}
               </p>
-              <div className="w-36 flex flex-col items-center py-3 rounded-xl font-semibold bg-gradient-to-br from-rose-400 to-fuchsia-700">
+              <div
+                onClick={handleCheckout}
+                className="w-36 flex flex-col items-center py-3 rounded-xl font-semibold bg-gradient-to-br from-rose-400 to-fuchsia-700 cursor-pointer"
+              >
                 Pay
               </div>
             </div>
@@ -166,25 +204,28 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleAddProduct = (index: number) => {
-    const updatedCart = cartItems.map((item, i) => i === index ? {...item, quantity: item.quantity + 1} : item)
-    setCartItems(updatedCart)
-    localStorage.setItem("cart", JSON.stringify(updatedCart))
-  }
-
- 
-  const handleRemoveProduct = (index: number) => {
     const updatedCart = cartItems.map((item, i) =>
-      i === index && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
+      i === index ? { ...item, quantity: item.quantity + 1 } : item
     );
     setCartItems(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-   const handleDeleteProduct = (index: number) => {
-     const updatedCart = cartItems.filter((item, i) => i !== index)
-     setCartItems(updatedCart);
-     localStorage.setItem("cart", JSON.stringify(updatedCart));
-   };
+  const handleRemoveProduct = (index: number) => {
+    const updatedCart = cartItems.map((item, i) =>
+      i === index && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const handleDeleteProduct = (index: number) => {
+    const updatedCart = cartItems.filter((item, i) => i !== index);
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
   const toggleCart = () => {
     setIsOpen(!isOpen);
